@@ -23,7 +23,9 @@ Note: Need Python 3, access to AWS (access-key-id, secret-access-key), and/or Ju
 1. In the Udacity workspace, open DMP.ipynb and run ```%run etl.py``` or
 2. In the Udacity workspace, open terminal
     1. run ```aws configure``` (Enter key id, secret password, 'us-west-2' for region, and json for format)
-    2. run ```python pipeline.py``` or
+    2. run ```python pipeline.py```
+    or
+    1. run ```aws configure``` (Enter key id, secret password, 'us-west-2' for region, and json for format)
     2. ```pip install runipy```
     3. ```runipy pipeline.ipynb```
 ## Validation
