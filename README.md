@@ -20,13 +20,13 @@ Build an ETL pipeline that extracts their data from S3, stages it in Redshift, a
 ![ERD](Sparkify_ERD.png)
 ## Running 
 Note: Need Python 3, access to AWS (access-key-id, secret-access-key), and/or Jupyter Notebook
-1. In the Udacity workspace, open DMP.ipynb and run ```%run etl.py``` or
+1. In the Udacity workspace, open pipeline.ipynb and run all cells UP TO cleaning up resources
 2. In the Udacity workspace, open terminal
-    1. run ```aws configure``` (Enter key id, secret password, 'us-west-2' for region, and json for format)
-    2. run ```python pipeline.py```
+    run ```aws configure``` (Enter key id, secret password, 'us-west-2' for region, and json for format)
+    run ```python pipeline.py```
     or
-    1. run ```aws configure``` (Enter key id, secret password, 'us-west-2' for region, and json for format)
-    2. ```pip install runipy```
-    3. ```runipy pipeline.ipynb```
-## Validation
+    run ```aws configure``` (Enter key id, secret password, 'us-west-2' for region, and json for format)
+    ```pip install runipy```
+    ```runipy pipeline.ipynb```
+## Validation (Optional)
 Run queries in analysis.ipynb.
