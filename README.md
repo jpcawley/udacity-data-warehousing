@@ -34,7 +34,7 @@ Build an ETL pipeline that extracts their data from S3, stages it in Redshift, a
 * format: `json`
 3. After creating role at least once, add hard coded `ARN` to `dwh.cfg` under `'IAM_ROLE'.roleARN` (with single quotes)
 4. After creating cluster at least once, add hard coded cluster `Endpoint` to dwh.cfg under `'CLUSTER'.'HOST'` (without quotes)
-5. Add `security_group_id` to `dwh.cfg` (without quotes)
+5. Add `SECURITY_GROUP_ID`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, and `ARN` to `dwh.cfg` (without quotes)
 
 Note: `ARN` and `Endpoint` can be found in the AWS console.
 
