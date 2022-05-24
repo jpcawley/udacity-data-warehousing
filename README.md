@@ -43,6 +43,8 @@ Note: Need Python 3, access to AWS (access-key-id, secret-access-key), and/or Ju
 or
 * In the Udacity workspace, open terminal and run ```python pipeline.py```
 ### Validation
-* Run queries in `analysis.ipynb` after ETL completes but BEFORE deleting AWS resources.
+* Run queries in `analysis.ipynb` after ETL completes but BEFORE deleting AWS resources
+
 or 
-* add queries 'analysis_queries' in `validate.py` and rerun `pipeline.py`.
+
+* Add queries 'analysis_queries' in `validate.py` and rerun `pipeline.py`
