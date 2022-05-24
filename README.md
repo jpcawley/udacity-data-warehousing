@@ -4,23 +4,23 @@ A music streaming startup, Sparkify, wants to analyze the [data](http://millions
 ### Project Objective
 Build an ETL pipeline that extracts their data from S3, stages it in Redshift, and transforms it into a set of dimensional tables for their analytics team to continue finding insights in what songs their users are listening to.
 ### Project Files
-- Congfiguration File
+1. Congfiguration File
 * `dwh.cfg`: configuration file with parameters and settings for the Sparkify data warehouse
-- Data in the bucket
+2. Data in the bucket
 * song_data: contains all json files for song data
 * log_data: contains all json files for log data
 * json_log_path: provides details about json structure for log_data files
-- Python files
+3. Python files
 * `create_tables.py`: Python file with functions to create and drop the database and its tables
 * `sql_queries.py`: Python file with drop, create, and insert SQL queries
 * `etl.py`: Python file that builds out the ETL process
 * `pipeline.py`: Python file that runs the ETL from start to finish
 * `validate.py`: Python file that executes queries for data validation
-- Jupyter Notebook(s)
+4. Jupyter Notebook(s)
 * `pipeline.ipynb`: Notebook to run the ETL from start to finish cell by cell
 * `analysis.ipynb`: Notebook to run selection queries for data validation
-- Sparkify Data Warehouse Schema
-- ReadMe
+5. Sparkify Data Warehouse Schema
+6. ReadMe
 
 ### Sparkify Data Warehouse Schema
 ![Schema](Sparkify_DWH_Schema.pdf)
