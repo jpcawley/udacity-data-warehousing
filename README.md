@@ -4,7 +4,7 @@ A music streaming startup, Sparkify, wants to analyze the [data](http://millions
 ### Project Objective
 Build an ETL pipeline that extracts their data from S3, stages it in Redshift, and transforms it into a set of dimensional tables for their analytics team to continue finding insights in what songs their users are listening to.
 ### Project Files
-1. Congfiguration File
+1. Configuration File
 * `dwh.cfg`: configuration file with parameters and settings for the Sparkify data warehouse
 2. Data in the bucket
 * song_data: contains all json files for song data
@@ -23,7 +23,7 @@ Build an ETL pipeline that extracts their data from S3, stages it in Redshift, a
 6. ReadMe
 
 ### Sparkify Data Warehouse Schema
-![Schema](Sparkify_DWH_Schema.pdf)
+![Schema](Sparkify_DWH_Schema.png)
 
 ### Configuration and Setup
 1. Create a new `IAM user` in your AWS account (Needed for role creation)
