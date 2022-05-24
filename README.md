@@ -4,7 +4,7 @@ A music streaming startup, Sparkify, wants to analyze the [data](http://millions
 ## Project Objective
 Build an ETL pipeline that extracts their data from S3, stages it in Redshift, and transforms it into a set of dimensional tables for their analytics team to continue finding insights in what songs their users are listening to.
 ## Contents
-1. Data in their s3 bucket
+1. Data in the bucket
     - udacity-dend/lsong_data: contains all json files for song data
     - udacity-dend/log_data: contains all json files for log data
 2. Python files
@@ -12,6 +12,7 @@ Build an ETL pipeline that extracts their data from S3, stages it in Redshift, a
     - sql_queries.py: Python file with drop, create, and insert SQL queries
     - etl.py: Python file that builds out the ETL process
     - pipeline.py: Python file that runs the ETL from start to finish
+    - validate.py: Python file that executes queries for data validation
 3. Jupyter Notebooks
     - pipeline.ipynb: Notebook to run the ETL from start to finish cell by cell
 4. Sparkify Database ERD
@@ -20,13 +21,9 @@ Build an ETL pipeline that extracts their data from S3, stages it in Redshift, a
 ![ERD](Sparkify_ERD.png)
 ## Running 
 Note: Need Python 3, access to AWS (access-key-id, secret-access-key), and/or Jupyter Notebook
-1. In the Udacity workspace, open pipeline.ipynb and run all cells UP TO cleaning up resources
+1. In the Udacity workspace, open pipeline.ipynb and run all cells or
 2. In the Udacity workspace, open terminal
-    run ```aws configure``` (Enter key id, secret password, 'us-west-2' for region, and json for format)
-    run ```python pipeline.py```
-    or
-    run ```aws configure``` (Enter key id, secret password, 'us-west-2' for region, and json for format)
-    ```pip install runipy```
-    ```runipy pipeline.ipynb```
-## Validation (Optional)
-Run queries in analysis.ipynb.
+    1. run ```aws configure``` (Enter key id, secret password, 'us-west-2' for region, and 'json' for format (w/o quotes))
+    2. run ```python pipeline.py```
+## Validation
+Run queries in analysis.ipynb or add queries to validate.py and rerun pipeline.py.
