@@ -55,7 +55,7 @@ def createIamRole(iam):
                                )['ResponseMetadata']['HTTPStatusCode']
         roleArn = iam.get_role(RoleName=ARN)['Role']['Arn']
 
-        print('IAM Role created successfully.', end='')
+        print('IAM Role created successfully.\n')
         return roleArn
     except Exception as e:
         print(e)
@@ -112,7 +112,7 @@ def deleteIamResources(iamRole, iam):
             iamRole: IAM role from dwh.cfg'''
     iam.detach_role_policy(RoleName=iamRole, PolicyArn="arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess")
     iam.delete_role(RoleName=iamRole)
-    print('Deleted IAM Role Resources.', end='')
+    print('Deleted IAM Role Resources.\n')
     return
 
 # Delete redshift cluster
@@ -149,22 +149,22 @@ def main():
     # Drop and create tables in Postgres
     print('Setting up database...')
     create_tables.main()
-    print('Dropped and recreated the database tables.', end='')
+    print('Dropped and recreated the database tables.\n')
     
     # Run main ETL
-    print('Starting transform and load processes.', end='')
+    print('Starting transform and load processes.\n')
     etl.main()
-    print('All data has been extracted, staged, transformed, and loaded into postgres. Main ETL complete.', end=' ')
+    print('All data has been extracted, staged, transformed, and loaded into postgres. Main ETL complete.\n')
     
     try:
         test = str(input('Would you like to validate the data? (Y/N)')).upper()
     except ValueError:
-        print('Invalid input. Please enter Y or N.')
+        print('Invalid input. Please enter Y or N.\n')
         
     if test == 'Y':
         validate.main()
     else:
-        print("You've elected not to (re)validate the data; as a result, all AWS resources are being deleted.")
+        print("You've elected not to (re)validate the data; as a result, all AWS resources are being deleted.\n")
             
         deleteIamResources(ARN, iam)      
         deleteRedshiftResources(redshift)
