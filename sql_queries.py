@@ -5,8 +5,10 @@ import configparser
 config = configparser.ConfigParser()
 config.read('dwh.cfg')
 ARN = config.get('IAM_ROLE','ARN')
+roleARN = config.get('IAM_ROLE', 'roleARN')
 LOG_DATA = config.get('S3','LOG_DATA')
 SONG_DATA = config.get('S3','SONG_DATA')
+LOG_JSONPATH = config.get('S3', 'LOG_JSONPATH')
 
 # DROP TABLES
 
@@ -21,25 +23,11 @@ time_table_drop = "DROP TABLE IF EXISTS time CASCADE"
 # CREATE TABLES
 
 staging_events_table_create= ("""
-CREATE TABLE IF NOT EXISTS events_staging
-  num_songs INT,
-  artist_id VARCHAR NOT NULL sortkey distkey,
-  artist_latitude DOUBLE PRECISION,
-  artist_longitude DOUBLE PRECISION,
-  artist_location VARCHAR,
-  artist_name VARCHAR NOT NULL,
-  song_id VARCHAR,
-  title VARCHAR NOT NULL,
-  duration NUMERIC NOT NULL,
-  year INT
-""")
-
-staging_songs_table_create = ("""
-CREATE TABLE IF NOT EXISTS songs_staging
+CREATE TABLE IF NOT EXISTS events_staging (
   artist VARCHAR,
   auth VARCHAR,
   firstName VARCHAR,
-  gender VARCHAR(1),
+  gender VARCHAR,
   itemInSession INT,
   lastName VARCHAR,
   length DOUBLE PRECISION,
@@ -47,24 +35,40 @@ CREATE TABLE IF NOT EXISTS songs_staging
   location VARCHAR,
   method VARCHAR,
   page VARCHAR,
-  registration INT,
+  registration BIGINT,
   sessionId INT,
   song VARCHAR,
   status INT,
-  ts INT NOT NULL,
+  ts BIGINT,
   userAgent VARCHAR,
-  userId INT NOT NULL sortkey distkey
+  userId INT
+)
+""")
+
+staging_songs_table_create = ("""
+CREATE TABLE IF NOT EXISTS songs_staging (
+  num_songs INT,
+  artist_id VARCHAR,
+  artist_latitude DOUBLE PRECISION,
+  artist_longitude DOUBLE PRECISION,
+  artist_location VARCHAR,
+  artist_name VARCHAR,
+  song_id VARCHAR sortkey distkey,
+  title VARCHAR,
+  duration NUMERIC,
+  year INT
+)
 """)
 
 songplay_table_create = ("""
 CREATE TABLE IF NOT EXISTS songplays
   (
-     songplay_id IDENTITY(0,1) sortkey,
-     start_time  TIMESTAMP NOT NULL REFERENCES time(start_time),
-     user_id     INT NOT NULL REFERENCES users(user_id),
+     songplay_id INT IDENTITY(0,1) sortkey,
+     start_time  TIMESTAMP NOT NULL,
+     user_id     INT,
      level       VARCHAR,
-     song_id     VARCHAR REFERENCES songs(song_id) distkey,
-     artist_id   VARCHAR REFERENCES artists(artist_id),
+     song_id     VARCHAR distkey,
+     artist_id   VARCHAR,
      session_id  INT,
      location    VARCHAR,
      user_agent  VARCHAR
@@ -97,7 +101,7 @@ artist_table_create = ("""
 CREATE TABLE IF NOT EXISTS artists
   (
      artist_id VARCHAR sortkey,
-     name      VARCHAR NOT NULL,
+     name      VARCHAR(500) NOT NULL,
      location  VARCHAR,
      latitude  DOUBLE PRECISION,
      longitude DOUBLE PRECISION
@@ -120,73 +124,97 @@ CREATE TABLE IF NOT EXISTS time
 # STAGING TABLES
 
 staging_events_copy = ("""
-    copy events_staging from '{}' 
+    copy events_staging from {} 
     credentials 'aws_iam_role={}'
-    gzip region 'us-east-1';
-""").format(LOG_DATA, ARN)
+    region 'us-west-2' json {};
+""").format(LOG_DATA, roleARN, LOG_JSONPATH)
 
 staging_songs_copy = ("""
-    copy songs_staging from '{}' 
+    copy songs_staging from {}
     credentials 'aws_iam_role={}'
-    gzip region 'us-east-1';
-""").format(SONG_DATA, ARN)
+    json 'auto'
+    region 'us-west-2';
+""").format(SONG_DATA, roleARN)
 
 # FINAL TABLES
 
 songplay_table_insert = ("""
-INSERT INTO songplays
-            (start_time,
-             user_id,
-             level,
-             song_id,
-             artist_id,
-             session_id,
-             location,
-             user_agent)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-ON CONFLICT (songplay_id) DO NOTHING""")
+INSERT INTO songplays (
+  start_time, user_id, level, song_id, 
+  artist_id, session_id, location, 
+  user_agent
+) 
+SELECT 
+  TIMESTAMP 'epoch' + e.ts / 1000 * INTERVAL '1 second' AS start_time, 
+  e.userid, 
+  e.level, 
+  s.song_id, 
+  s.artist_id, 
+  e.sessionId, 
+  e.location, 
+  e.userAgent 
+FROM 
+  events_staging e 
+  JOIN songs_staging s ON e.artist = s.artist_name 
+WHERE 
+  e.page = 'NextSong'
+""")
 
 user_table_insert = ("""
-INSERT INTO users
-            (user_id,
-             first_name,
-             last_name,
-             gender,
-             level)
-VALUES (%s, %s, %s, %s, %s)
-ON CONFLICT (user_id) DO UPDATE SET level = EXCLUDED.level""")
+INSERT INTO users (
+  user_id, first_name, last_name, gender, level
+) 
+SELECT 
+  DISTINCT userId, 
+  firstName, 
+  lastName, 
+  gender, 
+  level 
+FROM 
+  events_staging
+""")
 
 song_table_insert = ("""
-INSERT INTO songs
-            (song_id,
-             title,
-             artist_id,
-             YEAR,
-             duration)
-VALUES (%s, %s, %s, %s, %s)
-ON CONFLICT (song_id) DO NOTHING""")
+INSERT INTO songs (
+  song_id, title, artist_id, year, duration
+) 
+SELECT 
+  DISTINCT song_id, 
+  title, 
+  artist_id, 
+  year, 
+  duration 
+FROM 
+  songs_staging
+""")
 
 artist_table_insert = ("""
-INSERT INTO artists
-            (artist_id,
-             name,
-             location,
-             latitude,
-             longitude)
-VALUES (%s, %s, %s, %s, %s)
-ON CONFLICT (artist_id) DO NOTHING""")
+INSERT INTO artists (
+  artist_id, name, location, latitude, longitude
+) 
+SELECT 
+  DISTINCT artist_id, 
+  artist_name, 
+  artist_location, 
+  artist_latitude, 
+  artist_longitude 
+FROM 
+  songs_staging
+""")
 
 time_table_insert = ("""
-INSERT INTO time
-            (start_time,
-             hour,
-             day,
-             week,
-             month,
-             year,
-             weekday)
-VALUES (%s, %s, %s, %s, %s, %s, %s)
-ON CONFLICT DO NOTHING""")
+INSERT INTO TIME(start_time, hour, day, week, month, year, weekday)
+SELECT 
+  start_time, 
+  EXTRACT(hour FROM start_time),
+  EXTRACT(day FROM start_time),
+  EXTRACT(week FROM start_time),
+  EXTRACT(month FROM start_time),
+  EXTRACT(year FROM start_time),
+  EXTRACT(dow FROM start_time)
+FROM 
+  songplays
+""")
 
 # QUERY LISTS
 
