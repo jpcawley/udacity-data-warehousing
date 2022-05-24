@@ -39,7 +39,7 @@ def createIamRole(iam):
         parameters:
             iam: iam client'''
     try:
-        print('Creating a new IAM Role,', end='')
+        print('Creating a new IAM Role...')
         sparkifyRole = iam.create_role(
             Path='/',
             RoleName=ARN,
@@ -86,10 +86,16 @@ def createRedshiftCluster(iam, redshift):
         )
     except Exception as e:
             print(e)
+            
+    clusters = redshift.describe_clusters()
+    if clusters['Clusters'][0]['ClusterIdentifier'] != 'sparkifycluster':
+        status = response['Cluster']['ClusterStatus']
+    else:
 
-    status = response['Cluster']['ClusterStatus']
-
-    myClusterProps = redshift.describe_clusters(ClusterIdentifier=DWH_CLUSTER_IDENTIFIER)['Clusters'][0]
+        myClusterProps = redshift.describe_clusters(ClusterIdentifier=DWH_CLUSTER_IDENTIFIER)['Clusters'][0]
+#         status = myClusterProps['Cluster']['ClusterStatus']
+        status = myClusterProps['ClusterStatus']
+    
     time.sleep(20)
     print('Cluster creation is still in progress, checking status every 10 seconds.')
     while True:
@@ -101,8 +107,6 @@ def createRedshiftCluster(iam, redshift):
             sparkifyHost = myClusterProps['Endpoint']['Address']
             print('Created Redshift cluster "{}".'.format(DWH_CLUSTER_IDENTIFIER))
             break
-
-## Clean up AWS resources:
 
 # Delete IAM Role
 def deleteIamResources(iamRole, iam):
@@ -149,22 +153,25 @@ def main():
     # Drop and create tables in Postgres
     print('Setting up database...')
     create_tables.main()
-    print('Dropped and recreated the database tables.\n')
+    print('Database setup complete.\n')
     
     # Run main ETL
-    print('Starting transform and load processes.\n')
+    print('Beginning ETL...\n')
     etl.main()
     print('All data has been extracted, staged, transformed, and loaded into postgres. Main ETL complete.\n')
     
     try:
-        test = str(input('Would you like to validate the data? (Y/N)')).upper()
+        test = str(input('Would you like to validate the data? (Y/N)\n')).upper()
     except ValueError:
         print('Invalid input. Please enter Y or N.\n')
         
     if test == 'Y':
         validate.main()
+        
+        deleteIamResources(ARN, iam)      
+        deleteRedshiftResources(redshift)
     else:
-        print("You've elected not to (re)validate the data; as a result, all AWS resources are being deleted.\n")
+        print("All AWS resources will then be deleted.\n")
             
         deleteIamResources(ARN, iam)      
         deleteRedshiftResources(redshift)
