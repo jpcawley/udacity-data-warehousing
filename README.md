@@ -40,11 +40,11 @@ Note: `ARN` and `Endpoint` can be found in the AWS console.
 ### Running
 Note: Need Python 3, access to AWS (access-key-id, secret-access-key), and/or Jupyter Notebook
 * In the Udacity workspace, open `pipeline.ipynb` and run all cells 
+
 or
 * In the Udacity workspace, open terminal and run ```python pipeline.py```
 ### Validation
 * Run queries in `analysis.ipynb` after ETL completes but BEFORE deleting AWS resources
 
 or 
-
 * Add queries 'analysis_queries' in `validate.py` and rerun `pipeline.py`
