@@ -18,7 +18,7 @@ Build an ETL pipeline that extracts their data from S3, stages it in Redshift, a
 4. Sparkify Database ERD
 5. ReadMe
 ## Schema
-![ERD](Sparkify_ERD.png)
+![ERD](Sparkify_DWH_Schema.pdf)
 ## Running 
 Note: Need Python 3, access to AWS (access-key-id, secret-access-key), and/or Jupyter Notebook
 1. In the Udacity workspace, open pipeline.ipynb and run all cells or
